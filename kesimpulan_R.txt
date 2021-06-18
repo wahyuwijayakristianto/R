@@ -1,0 +1,207 @@
+dplyr
+
+mutate() membuat variabel baru berdasarkan variabel yang ada
+select() memilih variabel berdasarkan namannya
+filter() memfilter data berdasarkan value dari variabel
+summarise() mengubah beberapa nilai menjadi satu ringkasan nilai
+arrange() mengurutkan baris data
+
+------------------------------------------------------------------------
+tidyr
+
+spread() memformat data.frame menjadi wide, isi dari kolom key diubah menjadi nama kolom, dan isi dari kolom value diubah menjadi isi dari masing-masing kolom baris tersebut
+gather() memformat data.frame menjadi long, nama nama kolom yang dipilih dijadikan isi dari kolom key sedangkan yang sebelumnya isi dari kolom-kolom tersebut menjadi isi dari kolom value
+
+------------------------------------------------------------------------
+lubridate
+
+ymd() mengubah tipe character berformat YearMonthDate menjadi tipe Date
+ymd_hms() mengubah tipe character berformat YearMonthDate HourMinuteSecond menjadi tipe Timestamp
+floor_date() membulatkan Date/Timestampt kebawah sesuai tipe waktu yang diinput
+
+------------------------------------------------------------------------
+
+library(RMySQL)
+#Membuka koneksi
+con <- dbConnect(MySQL(), user="demo", password="demo", host="mysqlhost",
+                 dbname="dqlabdatawrangling")
+
+
+rs <- tryCatch(dbSendQuery(con, sql), finally = print("query ok"))
+tabel data <- fetch(rs, n=-1)
+dbClearResult(rs)
+
+#Menutup seluruh koneksi MySQL
+all_cons <- dbListConnections(MySQL())
+for(con in all_cons)
+    + dbDisconnect(con)
+
+---------------------------------------------------------------------------
+Data Wrangling
+
+
+NA : Not Avaliable, masih terdeteksi tapi isinya kosong
+NULL : tidak ada isinya
+NAN : Not A Number
+typeof(data) : menampilkan tipe data
+is.na(data) : pengecekkan apakah dia not avaliable atau tidak (TRUE/FALSE)
+is.nan(x) : pengecekkan apakah dia not a number atau tidak (TRUE/FALSE)
+lapply(data, fun) : mengeksekusi data berurutan memakai fungsi fun
+data[is.na(baris)] : mengambil baris nilai null di data
+mean(data,na.rm=TRUE) : na.rm = TRUE agar NA value tidak diikutsertakan
+factor(data) : menghilangkan kata yang sama
+levels(X)[ ] <- " " : untuk mengurutkan level factor
+c( ) : vector, menyimpan data dengan 1 tipe data 
+list( ) : list, menyimpan data dengan lebih dari 1 tipe data
+factor(c(data), levels = c(data)) : menata data dengan urutan levels
+length(x) : menampilkan jumlah isi data 
+str(data) : menampilkan struktur data
+glimse(data) : menampilkan struktur data / library(dplyr)
+data$values : menampilkan nilai data
+data$vectors : menampilkan vector data
+data.frame() : dataframe, menyimpan data dalam bentuk tabel
+names(data) : menampilkan nama kolom data
+names(data)[c(1:2)] <- c("X","Y") : mengganti nama kolom berurutan
+data <- data[,!names(data) %in% c("","","")] : memanggil data yang bukan termasuk(%in%) yang ada di vector
+as.factor(data) : mengubah data menjadi bertipe factor
+as.character(data) : mengubah data menjadi bertipe character
+plot(data$kolom) : plot digunakan untuk variabel bertipe Factor - function ini menghasilkan grafik Bar Plot.
+hist(data$kolom) : untuk variabel bertipe numerik seperti int - function ini menghasilkan grafik Histogram.
+n() : untuk menghitung baris 
+n_distinct : untuk menghitung unik data
+
+arah koreasi 
+miring kekanan : positive strong korelasi
+miring kekiri : negative strong korelasi
+datar / lurus : tidak ada korelasi
+
+cor.test(data$kolom) : digunakan untuk melihat hubungan secara statistik.
+table(data$kolom, data$kolom) : membuat sebuah tabel dengan data yang ditempatkan
+chisq.test(table(data$kolom, data$kolom)) : digunakan untuk melihat hubungan secara statistik.
+Membaca File
+read.csv("",sep="") : membaca File Casava
+read.xlsx("",sep="") : membaca File Excel / library(openxlsx)
+
+----------------------------------------------------------------
+
+statistik
+
+Kuantitatif adalah data yang dinyatakan dalam bentuk angka
+Kualitatif adalah data yang dinyatakan dalam bentuk bukan angka
+Outlier adalah data yang jaraknya jauh dari keseluruhan data
+mode(data$kolom) : menampilkan modus / library(pracma)
+median(data$kolom) : menampilkan median
+mean(data$kolom) : menampilkan mean
+var(data) : menampilkan varians data
+sd(data) : menampilkan standart deviasi
+summary(data) : menampilkan ringkasan data
+
+----------------------------------------------------
+
+data cleaning
+
+basic_pattern_analysis(data) : untuk mengganti nilai semua data menjadi inisial / library(bpa)
+basic_pattern_analysis(data,unique_only=TRUE) : mengetahui jumlah data yang nilainya sama / library(bpa)
+data[basic_pattern_analysis(data$kolom) == " ", ] : mencari data yang BPA nya sama dengan " "
+grepl (pattern="X", x="data") : untuk mengetahui apakah ada nilai X di data (TRUE/FALSE)
+cbind(data1,data2) : menggabungkan data1 dan data2
+
+database sql
+
+where column regexp '[X]' : menampilkan data yang memiliki data ada X nya
+regexp '^[^X]+$' : ^ diluar untuk awalan, ^ untuk negasi, +$ untuk akhiran
+gsub("X", "Y", data) :untuk mencari dan mengganti teks. X untuk nilai data, Y untuk pengganti X, data untuk datanya
+gsub ("\\b X \\b", "Y", data) : mencari data yang sama 
+	\\b untuk X harus sama persis
+	\\. adalah penulisan titik.
+	[ ]*\\. menunjukkan perulangan spasi yang mungkin mengikuti sebelum tanda titik.
+write.xlsx(file="nama.xlsx", data) 
+write.css(file = ,data)
+merge(x="data_pertama", y="data_kedua", by.x= "data_sama_x(PK)", by.y=data_sama_y(PK),all=TRUE) : untuk menggabungkan data pertama dan kedua
+read.xlsx(data) : membaca file Excel
+trimws(data,left=TRUE,RIGHT=TRUE) = untuk menghilangkan spasi di kanan dan kiri
+colsplit(data, "pattern", "isian") : isian bisa berupa vector tergantung jumlah pattern / library(reshape2)
+paste(data, data, data, sep=" ") : untuk menggabungkan data data dengan sep
+rbind(kolom, kolom) : menggabungkan kolom 
+as.Date(data,format) : mengatur format tanggal
+	%d : 1-31
+	%m : 00-12
+	%b : feb
+	%B : februari
+	%y : 99
+	%Y : 1999
+difftime(tanggal_awal, tanggal_target, units="days") : untuk menghitung perbandingan jarak tanggal
+stringdist("kalimat1","kalimat2",method="cosine") / library (stringdist)
+
+----------------------------------------------------------------------------------------------------------
+
+Plot
+
+ggplot() : memanggil kanvas / library(ggplot2)
+ggplot(aes(x="",y="",color="",fill=)) : color untuk memberikan perbedaan isi, fill memberikan perbedaan color dengan value
+labs(title="X") : menambahkan label judul 
+labs(x="",y="") : memberikan nama di sumbu x dan y
+ylab("") : mengisi nama sumbu Y
+xlab("") : mengisi nama sumbu X
+layer(geom= "", stat="", position="") : Function yang digunakan untuk membentuk layer untuk ditambahkan pada plot
+geom : Bentuk geometri yang digunakan untuk layer.
+	point: untuk menggambar grafik berupa titik yang menunjukkan hubungan antar variable atau scatter plot
+	line: diagram garis
+	hline: diagram garis horizontal
+	bar: diagram batang
+	histogram: histogram
+
+stat : Jenis transformasi untuk merubah data dari bentuk asli ke bentuk lain. 
+	identity: tidak melakukan transformasi
+	bin: membagi data menjadi interval
+	sum: menjumlahkan nilai-nilai yang unik
+	summary: melakukan summary dari semua nilai y untuk setiap titik data x
+
+position : Perubahan posisi terhadap tiap titik yang terdapat pada layer. 
+	identity: tidak ada perubahan posisi
+	jitter: merubah posisi dengan jarak acak tertentu dari posisi awal, ini digunakan untuk memberi kejelasan jika banyak titik yang overlapping (saling tindih)
+	stack: menyusun posisi dalam bentuk tumpukan
+	dodge: objek satu dengan objek yang lain diposisikan bersisian
+
+geom_text(aes(label=format(round(data,))))
+geom_point() : geom untuk point dan secara otomatis akan memiliki nilai "identity" untuk stat dan position (default)
+geom_line() : garis
+geom_bar() : chart dengan default stat = "count"
+geom_histogram(binwidth=x) : bindwidth untuk mengatur lebar/besar histogram
+histogram cocok untuk jumlah populasi data
+geom_text(label=) : memberi nilai pada grafik 
+aggregate(x=list(),by=list(),FUN)
+theme(axis.text.x = element_text(angle=45,vjust = 0.5) : mengatur teks pada grafik, vjust agar text di tengah2
+plot.title = element_text(hjust=0.5) : 	Mengatur posisi teks pada title ke tengah
+geom_text(position = position_dodge(1)) : posisi text di atas bar
+coord_polar("y", start=0) : membuat pie chart
+facet_wrap( ~ NAMA.KABUPATEN.KOTA, ncol=2) : ncol pembagian kolom
+
+transaksi <- read.transactions(file="https://academy.dqlab.id/dataset/data_transaksi.txt", format="single"/basket, sep="\t", cols=c(1,2), skip=1) library(alures)
+transaksi@itemInfo : @ untuk melihat daftar unik
+itemFrequency(data , type : "absolute") : frekuensi data tampil, absolute bilangan bulat
+itemFrequencyPlot () : menampilkan plot frekuensi data
+data_item <- sort(data_item, decreasing = TRUE) : menampilkan nilai dari yang terbesar
+inspect(data) : Untuk melihat notasi itemset yang lebih baik dan mudah dimengerti
+inspect(subset(mba, rhs %in% "Sirup")) : Ini artinya kita akan filter rules dimana pada rhs memiliki item "Sirup".
+apriori(data,parameter = list(supp =, confidence =))
+inspect(subset(mba, (lhs %in% "Teh Celup" | rhs %in% "Teh Celup") & lift > 1)) : setting lift > 1
+inspect(subset(mba, (lhs %ain% c("Pet Food", "Gula" )))) : agar output lhs yang dikeluarkan sama persis dengan vector yang diinginkan
+
+data.matrix(data) : memberi nilai dalam bentuk angka/ klasifikasi
+unique(data) : menampikan data unik
+kmeans(x = data, centers = , nstart = ) : mencari cluster rata-rata, centers adalah pembagian nya
+segmentasi$(bawah)
+cluster : Vector dari cluster untuk tiap titik data : [1] 2 1 5 5 4 1 2 5 3 3 5 5 2 2 1 3 3 2 3
+centers : Merupakan informasi titik centroid dari tiap cluster, seperti pada bagian "Analisa Hasil Cluster Means"
+totss : Total Sum of Squares (SS) untuk seluruh titik data : [1] 10990.97
+withinss : Total Sum of Squares per cluster : [1] 316.73367  58.21123 174.85164 171.67372 108.49735
+tot.withinss : Total penjumlahan dari tiap SS dari withinss : [1] 829.9676
+betweenss : Perbedaan nilai antara totss dan tot.withinss : [1] 10161.01
+size : Jumlah titik data pada tiap cluster : [1] 14  5 12  9 10
+iter :Jumlah iterasi luar yang digunakan oleh kmeans : 2
+ifault : Nilai integer yang menunjukkan indikator masalah pada algoritma
+sse <- sapply(1:10, function(param_k) { kmeans(pelanggan[c(field_yang_digunakan)], param_k, nstart=25)$tot.withinss})
+saveRDS(Identitas.Cluster, "cluster.rds") : menyimpan objek ini ke dalam file kita gunakan function saveRDS
+prcomp(x, center = TRUE, scale. = FALSE) : 
+predict(pcaobject, newdata = newdataset) : 
